@@ -1,0 +1,23 @@
+# Local PostgreSQL for development.   Start:  docker compose up -d     Stop:  docker compose down
+# Reads POSTGRES_* values from the .env file next to this file (copy .env.example to .env first).
+services:
+  db:
+    image: postgres:16
+    container_name: cinefy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cinefy}
+      POSTGRES_USER: ${POSTGRES_USER:-cinefy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - cinefy-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cinefy} -d ${POSTGRES_DB:-cinefy}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  cinefy-pgdata:
